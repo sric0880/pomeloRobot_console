@@ -17,11 +17,9 @@
 2. 重启
 3. `launchctl limit`查看是否生效
 
-每一个进程最大线程数有限制，推荐执行如下语句：
+每一个进程最大线程数有限制（MacOSX 10.8.5上为 2048 per process），推荐执行如下语句：
 `./pomeloRobot_console 1000 10 usr`
 但允许开启多个控制台，maxfiles=60000支持12000个（maxfiles/5）客户端，所以可以开12个控制台执行语句。
-
-作者MacOS X 10.8.5 4Gmem i5 2.3GHz 在设置maxfiles 60000后，运行一段时间系统崩溃
 
 
 
