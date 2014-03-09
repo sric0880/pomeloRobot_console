@@ -17,7 +17,7 @@
 #include "TaskRunnerContainer.h"
 using namespace std;
 
-const char* HOST = "192.168.1.110";
+const char* HOST = "127.0.0.1";
 const int PORT = 3010;
 const int bet_cols_size = 8;
 random_device rd;
@@ -54,15 +54,32 @@ void random_bet(int bet_cols, int max_limit, int* res)
     }
 }
 
+void spawn(int n)
+{
+    if(n)
+    {
+        if(fork())//parent process
+        {
+            signal(SIGCHLD, SIG_IGN);
+            if(n)
+            {
+                spawn(n-1);
+            }
+            else
+                return;
+        }
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     if (argc!=4) {
-        cout<<"Usage: ./pomelo_robot [clients_nums] [thread_nums] [usrname_prefix]"<<endl;
+        cout<<"Usage: ./pomelo_robot [child_process_nums] [thread_nums] [clients_nums]"<<endl;
         return 0;
     }
-    int clients_nums = atoi(argv[1]);
+    int proc_nums = atoi(argv[1]);
+    int clients_nums = atoi(argv[3]);
     int thread_nums = atoi(argv[2]);
-    const char* userNamePre = argv[3];
     
     if (clients_nums == 0) {
         clients_nums = 1;
@@ -71,12 +88,15 @@ int main(int argc, const char * argv[])
         thread_nums = 1;
     }
     
+    //create more than one process
+    spawn(proc_nums);
+    
     vector<thread> threads(thread_nums);
     TaskRunnerContainer trc(HOST,PORT,clients_nums);
-    auto taskGenerator = [userNamePre](int id)->TaskRunner*{
+    auto taskGenerator = [](int id)->TaskRunner*{
         TaskRunner* tr = new TaskRunner(id);
-        char username[10];
-        sprintf(username, "%s%d",userNamePre, id);
+        char username[20];
+        sprintf(username, "%d-%d",getpid(), id);
         
         /*login request*/
         json_t *msg = json_object();
@@ -84,7 +104,7 @@ int main(int argc, const char * argv[])
         tr->addRequestTask("connector.entryHandler.enter",msg);
         
         /*send msg request*/
-        for (int k = 0; k < 1000; ++k) {
+        for (int k = 0; k < 100; ++k) {
             json_t *msg1 = json_object();
             int res[bet_cols_size] = {0};
             random_bet(uni1(ran), 10, res);
@@ -106,10 +126,6 @@ int main(int argc, const char * argv[])
     for (int i = 0; i < thread_nums; ++i) {
         threads[i].join();
     }
-    
-    std::cout<<"press any key to quit..."<<endl;
-    char a;
-    std::cin>>a;
     trc.release();
     return 0;
 }
