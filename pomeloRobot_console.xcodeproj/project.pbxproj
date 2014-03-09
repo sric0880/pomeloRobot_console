@@ -344,7 +344,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
-				LIBRARY_SEARCH_PATHS = "/Users/qiong/Documents/cocos2dx-3.0beta-workspace/fruits-slots/libs/pomeloRobot_console/libs";
+				LIBRARY_SEARCH_PATHS = "/Users/qiong/Documents/cocos2dx-3.0beta-workspace/pomeloRobot_console/libs";
 				MACH_O_TYPE = mh_execute;
 				OTHER_LDFLAGS = "-lpomelo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,7 +358,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
-				LIBRARY_SEARCH_PATHS = "/Users/qiong/Documents/cocos2dx-3.0beta-workspace/fruits-slots/libs/pomeloRobot_console/libs";
+				LIBRARY_SEARCH_PATHS = "/Users/qiong/Documents/cocos2dx-3.0beta-workspace/pomeloRobot_console/libs";
 				MACH_O_TYPE = mh_execute;
 				OTHER_LDFLAGS = "-lpomelo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -385,6 +385,7 @@
 				CF040D9D18BB270E00BAF2DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
