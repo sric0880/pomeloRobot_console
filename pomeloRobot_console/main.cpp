@@ -17,7 +17,9 @@
 #include "TaskRunnerContainer.h"
 using namespace std;
 
-const char* HOST = "115.28.33.15";
+//const char* HOST = "127.0.0.1";
+const char* HOST = "192.168.1.117";
+//const char* HOST = "115.28.33.15";
 const int PORT = 3010;
 const int bet_cols_size = 8;
 random_device rd;
@@ -104,7 +106,7 @@ int main(int argc, const char * argv[])
         tr->addRequestTask("connector.entryHandler.enter",msg);
         
         /*send msg request*/
-        for (int k = 0; k < 100; ++k) {
+        for (int k = 0; k < 10; ++k) {
             json_t *msg1 = json_object();
             int res[bet_cols_size] = {0};
             random_bet(uni1(ran), 10, res);

@@ -22,7 +22,7 @@ TaskRunner::~TaskRunner(){
         json_decref(req.content);
     }
     if (!_logout) {
-        stop();
+//        stop();   //not logout.
     }
 #if __FILELOG__
     fout.close();

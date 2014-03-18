@@ -65,7 +65,7 @@ void TaskRunnerContainer::runTask()
             {
 //                queue_mutex.lock();
                 std::unique_lock<std::mutex> lm(queue_mutex);
-//                tr->printStatistics(std::cout);
+                tr->printStatistics(std::cout);
                 tr->printStatistics(_fout);
 //                queue_mutex.unlock();
             }
