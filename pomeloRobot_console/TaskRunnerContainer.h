@@ -21,7 +21,7 @@ public:
     TaskRunnerContainer(const char* addr, int port, int clients_nums);
     virtual ~TaskRunnerContainer();
     void runTask();
-    void statEverySec();
+    void statEverySec();          //FIXME: 暂时不正确
     void setGenerateFunc(std::function<TaskRunner*(int)>);
     void release();
     /*statistic*/

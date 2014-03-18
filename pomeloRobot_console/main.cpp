@@ -84,11 +84,11 @@ int main(int argc, const char * argv[])
     for (int i = 0; i < thread_nums; ++i) {
         threads[i] = thread(&TaskRunnerContainer::runTask, &trc);
     }
-    thread statThread(&TaskRunnerContainer::statEverySec, &trc);
+//    thread statThread(&TaskRunnerContainer::statEverySec, &trc);
     for (int i = 0; i < thread_nums; ++i) {
         threads[i].join();
     }
-    statThread.join();
+//    statThread.join();
     trc.release();
     return 0;
 }
