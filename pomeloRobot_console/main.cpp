@@ -17,7 +17,7 @@
 #include "TaskRunnerContainer.h"
 using namespace std;
 
-const char* HOST = "127.0.0.1";
+const char* HOST = "115.28.33.15";
 const int PORT = 3010;
 const int bet_cols_size = 8;
 random_device rd;
