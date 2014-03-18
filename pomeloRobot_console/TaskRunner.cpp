@@ -6,6 +6,7 @@
 #include <numeric>
 #include <mutex>
 #include <condition_variable>
+#include <TaskRunnerContainer.h>
 
 TaskRunner::TaskRunner(int runnerId)
 :_id(runnerId),_stop_conn_time(0),_logout(true)
@@ -57,6 +58,7 @@ void TaskRunner::run(const char* addr, int port)
         auto req_func = bind(&TaskRunner::request,this,iter->route,iter->content);
         result.push_back(durationOfFunction(req_func));
         ++_total_count;
+        ++TaskRunnerContainer::_totalReqs;
     }
     
     /*close the connection*/
@@ -159,14 +161,13 @@ int TaskRunner::get_id()
 void TaskRunner::printHeader(ostream& output)
 {
     output.setf(ios::left);
-    output<<"#"<<"id\t\t"<<setw(8)<<"conn"<<setw(8)<<"stop"<<
-    setw(8)<<"max_req"<<setw(8)<<"min_req"<<setw(8)<<"avg_req"<<setw(8)<<
-    "duration"<<"\t"<<"total_count"<<"\t"<<"query_per_sec"<<"\t"<<endl;
+    output<<"#"<<"id\t"<<"conn\t"<<"stop\t"<<"max_req\t"<<"min_req\t"<<"avg_req\t"<<
+    "duration\t"<<"total_count\t"<<"query_per_sec\t"<<endl;
 }
 
 void TaskRunner::printStatistics(ostream& output)
 {
     output.setf(ios::fixed|ios::left);
-    output<<"#"<<_id<<"\t\t"<<std::setprecision(3)<<setw(8)<<_connection_time<<setw(8)<<_stop_conn_time<<setw(8)<<_max_req_time<<setw(8)<<_min_req_time<<setw(8)<<_avg_req_time<<setw(8)<<
-    _duration<<setw(5)<<_total_count<<setw(5)<<_query_per_sec<<endl;
+    output<<"#"<<_id<<"\t"<<std::setprecision(3)<<_connection_time<<"\t"<<_stop_conn_time<<"\t"<<_max_req_time<<"\t"<<_min_req_time<<"\t"<<_avg_req_time<<"\t"<<
+    _duration<<"\t"<<_total_count<<"\t"<<_query_per_sec<<endl;
 }
