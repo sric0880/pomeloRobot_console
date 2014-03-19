@@ -37,7 +37,7 @@ void spawn(int n)
 
 int main(int argc, const char * argv[])
 {
-    if (argc!=4) {
+    if (argc!=3) {
         cout<<"Usage: ./pomelo_robot [child_process_nums] [clients_nums]"<<endl;
         return 0;
     }
