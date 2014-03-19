@@ -21,7 +21,7 @@ class TaskRunnerContainer{
 public:
     TaskRunnerContainer(const char* addr, int port, int clients_nums);
     virtual ~TaskRunnerContainer();
-    void startRun(int numOfThreads);
+    void startRun();
     void setGenerateFunc(std::function<TaskRunner*(int)>&&);
     void release();
     /*statistic*/

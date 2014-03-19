@@ -75,18 +75,14 @@ void spawn(int n)
 int main(int argc, const char * argv[])
 {
     if (argc!=4) {
-        cout<<"Usage: ./pomelo_robot [child_process_nums] [thread_nums] [clients_nums]"<<endl;
+        cout<<"Usage: ./pomelo_robot [child_process_nums] [clients_nums]"<<endl;
         return 0;
     }
     int proc_nums = atoi(argv[1]);
-    int clients_nums = atoi(argv[3]);
-    int thread_nums = atoi(argv[2]);
+    int clients_nums = atoi(argv[2]);
     
     if (clients_nums == 0) {
         clients_nums = 1;
-    }
-    if (thread_nums == 0) {
-        thread_nums = 1;
     }
     
     //create more than one process
@@ -118,7 +114,7 @@ int main(int argc, const char * argv[])
         }
         return tr;
     }, placeholders::_1));
-    trc.startRun(thread_nums);
+    trc.startRun();
     return 0;
 }
 
