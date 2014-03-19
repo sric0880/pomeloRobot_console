@@ -9,7 +9,7 @@
 #include <TaskRunnerContainer.h>
 
 TaskRunner::TaskRunner(int runnerId)
-:_id(runnerId),_stop_conn_time(0),_logout(true)
+:_id(runnerId),_stop_conn_time(0)
 {
     char filename[20];
     sprintf(filename, "log_%d.txt", runnerId);
@@ -20,9 +20,6 @@ TaskRunner::TaskRunner(int runnerId)
 TaskRunner::~TaskRunner(){
     for (auto& req: _req_list) {
         json_decref(req.content);
-    }
-    if (!_logout) {
-        stop();
     }
 #if __FILELOG__
     fout.close();
@@ -45,26 +42,17 @@ void TaskRunner::run(const char* addr, int port)
     fout<<"TaskRunner #"<<_id<<" start running..."<<endl;
 #endif
     _total_count = 0;
-    auto conn_func = bind(&TaskRunner::connect,this,addr,port);
-    _connection_time = durationOfFunction(conn_func);
-    
 #if __FILELOG__
     fout<<"TaskRunner #"<<_id<<" connect success."<<endl;
 #endif
     vector<double> result;
-    
     auto iter = _req_list.begin();
     for (;iter!=_req_list.end();++iter) {
-        auto req_func = bind(&TaskRunner::request,this,iter->route,iter->content);
-        result.push_back(durationOfFunction(req_func));
+        result.push_back(durationOfFunction(bind(&TaskRunner::_request,this,iter->route,iter->content)));
         ++_total_count;
         ++TaskRunnerContainer::_totalReqs;
     }
     
-    /*close the connection*/
-    if (_logout) {
-        _stop_conn_time = durationOfFunction(bind(&TaskRunner::stop,this));
-    }
 #if __FILELOG__
     fout<<"TaskRunner #"<<_id<<" end running..."<<endl;
 #endif
@@ -77,7 +65,7 @@ void TaskRunner::run(const char* addr, int port)
     _query_per_sec = (_total_count)*1000/_duration;
 }
 
-void TaskRunner::request(string& router,json_t* content)
+void TaskRunner::_request(string& router,json_t* content)
 {
     pc_request_t *request = pc_request_new();
     request->data = this;
@@ -102,6 +90,10 @@ void _pc_request_cb(pc_request_t *req, int status, json_t *resp)
 
 void TaskRunner::connect(const char* addr, int port)
 {
+    _connection_time = durationOfFunction(bind(&TaskRunner::_connect,this,addr,port));
+}
+void TaskRunner::_connect(const char* addr, int port)
+{
     _client = pc_client_new();
     struct sockaddr_in address;
     
@@ -123,6 +115,11 @@ void TaskRunner::connect(const char* addr, int port)
 
 void TaskRunner::stop()
 {
+    /*close the connection*/
+    _stop_conn_time = durationOfFunction(bind(&TaskRunner::_stop,this));
+}
+void TaskRunner::_stop()
+{
     if(_client){
         pc_client_destroy(_client);
     }
@@ -132,7 +129,7 @@ void TaskRunner::stop()
     
 }
 
-double TaskRunner::durationOfFunction(function<void()> func)
+double TaskRunner::durationOfFunction(function<void()>&& func)
 {
     /*copy from http://en.cppreference.com/w/cpp/chrono*/
     std::chrono::time_point<std::chrono::system_clock> start, end;
@@ -141,16 +138,6 @@ double TaskRunner::durationOfFunction(function<void()> func)
     end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
     return elapsed_seconds.count()*1000;
-}
-
-void TaskRunner::setLogout(bool logout)
-{
-    _logout = logout;
-}
-
-bool TaskRunner::isLogout()
-{
-    return _logout;
 }
 
 int TaskRunner::get_id()

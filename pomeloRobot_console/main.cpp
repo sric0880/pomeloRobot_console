@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <thread>
 #include <vector>
 #include <functional>
 #include <unistd.h>
@@ -56,9 +55,8 @@ int main(int argc, const char * argv[])
     //create more than one process
     spawn(proc_nums);
     
-    vector<thread> threads(thread_nums);
     TaskRunnerContainer trc(HOST,PORT,clients_nums);
-    auto taskGenerator = [](int id)->TaskRunner*{
+    trc.setGenerateFunc(bind([](int id)->TaskRunner*{
         TaskRunner* tr = new TaskRunner(id);
         char username[20];
         sprintf(username, "%d-%d",getpid(), id);
@@ -76,20 +74,9 @@ int main(int argc, const char * argv[])
 //        json_object_set_new(msg1, "from", json_string(username));
 //        json_object_set_new(msg1, "target", json_string("*"));
 //        tr->addRequestTask("chat.chatHandler.send",msg1);
-        
-        tr->setLogout(false);//不退出登录
         return tr;
-    };
-    trc.setGenerateFunc(bind(taskGenerator, placeholders::_1));
-    for (int i = 0; i < thread_nums; ++i) {
-        threads[i] = thread(&TaskRunnerContainer::runTask, &trc);
-    }
-//    thread statThread(&TaskRunnerContainer::statEverySec, &trc);
-    for (int i = 0; i < thread_nums; ++i) {
-        threads[i].join();
-    }
-//    statThread.join();
-    trc.release();
+    }, placeholders::_1));
+    trc.startRun(thread_nums);
     return 0;
 }
 

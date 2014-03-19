@@ -11,7 +11,8 @@
 
 #include <functional>
 #include <string>
-#include <vector>
+//#include <vector>
+#include <stack>
 #include <fstream>
 
 class TaskRunner;
@@ -20,9 +21,8 @@ class TaskRunnerContainer{
 public:
     TaskRunnerContainer(const char* addr, int port, int clients_nums);
     virtual ~TaskRunnerContainer();
-    void runTask();
-    void statEverySec();          //FIXME: 暂时不正确
-    void setGenerateFunc(std::function<TaskRunner*(int)>);
+    void startRun(int numOfThreads);
+    void setGenerateFunc(std::function<TaskRunner*(int)>&&);
     void release();
     /*statistic*/
     static int _totalReqs;        //当前已发送的请求总数
@@ -32,9 +32,14 @@ private:
     int _port;
     int _client_nums;
     int _current_client_id;
-    std::vector<TaskRunner*> _toRelease;
+    std::stack<TaskRunner*> _container;
+    
     std::ofstream _fout;
-    std::ofstream _fout_summary;
+//    std::ofstream _fout_summary;
+    
+    void consume();
+    void product();
+    void statEverySec();          //FIXME: 暂时不正确
 };
 
 #endif /* defined(__pomeloRobot_console__TaskRunnerContainer__) */
