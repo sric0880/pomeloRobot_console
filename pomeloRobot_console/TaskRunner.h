@@ -23,8 +23,6 @@ public:
 	virtual ~TaskRunner();
 
 	void addRequestTask(const char* router,json_t* content);
-    void setLogout(bool logout);
-    bool isLogout();
 
 	/**
  *	@brief	start a new worker thread
@@ -35,6 +33,8 @@ public:
  *	@param 	port 	port
 **/
     void run(const char* addr, int port);
+    void connect(const char* addr, int port);
+    void stop();
     
     condition_variable cv;
     mutex m;
@@ -49,7 +49,6 @@ private:
 	int _id;
 	pc_client_t * _client;
 	vector<ReqBody> _req_list;
-    bool _logout;
 
 	/*statistic unit: s*/
 	double _connection_time;
@@ -61,9 +60,10 @@ private:
 	double _duration;
 	int _total_count;
     
-    void connect(const char* addr, int port);
-    void request(string& router,json_t* content);
-    void stop();
     
-    double durationOfFunction(function<void()> func);
+    void _request(string& router,json_t* content);
+    void _connect(const char* addr, int port);
+    void _stop();
+    
+    double durationOfFunction(function<void()>&& func);
 };
