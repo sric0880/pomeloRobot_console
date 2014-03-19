@@ -42,7 +42,7 @@ std::mutex queue_mutex;
 #include <chrono>
 using namespace std::chrono;
 
-void TaskRunnerContainer::startRun(int numOfThreads)
+void TaskRunnerContainer::startRun()
 {
     product();
     vector<thread> threads(_client_nums);
