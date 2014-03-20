@@ -64,6 +64,10 @@ void TaskRunnerContainer::product()
     }
 }
 
+static double _alltime = 0;
+static unsigned long _count = 0;
+static unsigned long _onlineUser = 0;
+
 void TaskRunnerContainer::consume()
 {
     TaskRunner* task;
@@ -72,20 +76,30 @@ void TaskRunnerContainer::consume()
         task = _container.top();
         _container.pop();
         task->connect(_addr.c_str(), _port);
+        ++_onlineUser;
     }
-    unsigned int time = 0;
+//    unsigned int time = 0;
     do {
         task->run(_addr.c_str(), _port);
         {
-            int rtime = uid(rg);
-            time += rtime;
-            sleep(rtime);
+//            time += rtime;
+            sleep(uid(rg));
+            double temp = task->getAvgReqTime();
             std::unique_lock<std::mutex> lm(queue_mutex);
-            task->printStatistics(std::cout);
-            task->printStatistics(_fout);
+            _alltime+=temp;
+            ++_count;
+            double allAvgTime = _alltime/_count;
+            if (!task->isOnline) {
+                break;
+            }
+            std::cout<<temp<<"\t"<<allAvgTime<<"\t"<<_onlineUser<<endl;
+            _fout<<temp<<"\t"<<allAvgTime<<"\t"<<_onlineUser<<endl;
+//            task->printStatistics(_fout);
+//            task->printStatistics(std::cout);
         }
-    } while (time < 60);
+    } while (1);
     task->stop();
+    --_onlineUser;
 }
 
 void TaskRunnerContainer::statEverySec()

@@ -14,6 +14,7 @@ using namespace std;
 typedef struct requset_body {
     string route;
     json_t* content;
+    int repeatTimes;
 }ReqBody;
 
 class TaskRunner
@@ -22,7 +23,7 @@ public:
 	TaskRunner(int runnerId);
 	virtual ~TaskRunner();
 
-	void addRequestTask(const char* router,json_t* content);
+	void addRequestTask(const char* router,json_t* content, int);
 
 	/**
  *	@brief	start a new worker thread
@@ -40,9 +41,11 @@ public:
     mutex m;
     ofstream fout;
     int get_id();
+    bool isOnline;
     
     void printStatistics(ostream& output);
     static void printHeader(ostream& output);
+    double getAvgReqTime();
 
 	/* data */
 private:

@@ -9,7 +9,7 @@
 #include <TaskRunnerContainer.h>
 
 TaskRunner::TaskRunner(int runnerId)
-:_id(runnerId),_stop_conn_time(0)
+:_id(runnerId),_stop_conn_time(0),isOnline(false)
 {
     char filename[20];
     sprintf(filename, "log_%d.txt", runnerId);
@@ -28,11 +28,12 @@ TaskRunner::~TaskRunner(){
 
 void _pc_request_cb(pc_request_t *req, int status, json_t *resp);
 
-void TaskRunner::addRequestTask(const char* router,json_t* content)
+void TaskRunner::addRequestTask(const char* router,json_t* content, int times)
 {
     ReqBody body;
     body.route = router;
     body.content = content;
+    body.repeatTimes = times;
 	_req_list.push_back(body);
 }
 
@@ -47,10 +48,15 @@ void TaskRunner::run(const char* addr, int port)
 #endif
     vector<double> result;
     auto iter = _req_list.begin();
+    if (iter == _req_list.end()) {
+        return;
+    }
     for (;iter!=_req_list.end();++iter) {
-        result.push_back(durationOfFunction(bind(&TaskRunner::_request,this,iter->route,iter->content)));
-        ++_total_count;
-        ++TaskRunnerContainer::_totalReqs;
+        for (int i = 0; i < iter->repeatTimes; ++i) {
+            result.push_back(durationOfFunction(bind(&TaskRunner::_request,this,iter->route,iter->content)));
+            ++_total_count;
+//        ++TaskRunnerContainer::_totalReqs;
+        }
     }
     
 #if __FILELOG__
@@ -69,7 +75,10 @@ void TaskRunner::_request(string& router,json_t* content)
 {
     pc_request_t *request = pc_request_new();
     request->data = this;
-    pc_request(_client, request, router.c_str(), content, _pc_request_cb);
+    int ret = pc_request(_client, request, router.c_str(), content, _pc_request_cb);
+    if (ret) {
+        isOnline = false;
+    }
     unique_lock<mutex> lk(m);
     cv.wait(lk);
     lk.unlock();
@@ -111,6 +120,7 @@ void TaskRunner::_connect(const char* addr, int port)
         pc_client_destroy(_client);
         exit(100);
     }
+    isOnline = true;
 }
 
 void TaskRunner::stop()
@@ -143,6 +153,11 @@ double TaskRunner::durationOfFunction(function<void()>&& func)
 int TaskRunner::get_id()
 {
     return _id;
+}
+
+double TaskRunner::getAvgReqTime()
+{
+    return _avg_req_time;
 }
 
 void TaskRunner::printHeader(ostream& output)

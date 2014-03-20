@@ -17,7 +17,7 @@
 using namespace std;
 
 //const char* HOST = "127.0.0.1";
-const char* HOST = "192.168.1.117";
+const char* HOST = "192.168.1.112";
 //const char* HOST = "115.28.33.15";
 const int PORT = 3010;
 const int bet_cols_size = 8;
@@ -97,21 +97,19 @@ int main(int argc, const char * argv[])
         /*login request*/
         json_t *msg = json_object();
         json_object_set_new(msg, "uid", json_string(username));
-        tr->addRequestTask("connector.entryHandler.enter",msg);
+        tr->addRequestTask("connector.entryHandler.enter",msg,1);
         
         /*send msg request*/
-        for (int k = 0; k < 10; ++k) {
-            json_t *msg1 = json_object();
-            int res[bet_cols_size] = {0};
-            random_bet(uni1(ran), 10, res);
-            json_t* arr = json_array();
-            for (int i = 0; i < bet_cols_size; ++i) {
-                json_array_append(arr, json_integer(res[i]));
-            }
-            json_object_set_new(msg1, "v", arr);
-            json_object_set_new(msg1, "gid", json_integer(uni(ran)));
-            tr->addRequestTask("connector.entryHandler.random",msg1);
-        }
+//        json_t *msg1 = json_object();
+//        int res[bet_cols_size] = {0};
+//        random_bet(uni1(ran), 10, res);
+//        json_t* arr = json_array();
+//        for (int i = 0; i < bet_cols_size; ++i) {
+//            json_array_append(arr, json_integer(res[i]));
+//        }
+//        json_object_set_new(msg1, "v", arr);
+//        json_object_set_new(msg1, "gid", json_integer(uni(ran)));
+//        tr->addRequestTask("connector.entryHandler.random",msg1, 10);
         return tr;
     }, placeholders::_1));
     trc.startRun();
