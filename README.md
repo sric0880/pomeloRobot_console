@@ -6,10 +6,10 @@
 
 传入两个个参数：
 
-1. arg1，child_process_nums，子线程数量，见注意事项2。
+1. arg1，child_process_nums，子进程数量，见注意事项2。
 2. arg2，clients_nums，每进程发起客户端个数。
 	
-	可以配置客户端请求事件的顺序和数量。完成所有请求之后，退出当前线程。
+	可以配置客户端请求事件的顺序和数量。客户一旦连接上服务器，就一直保持长连接，不释放，并且循环重复发送请求事件。
 	
 	<strong>注意：
 	* 并不是同时clients_nums并发，理论并发数=clients_nums * (child_process_nums+1)，实际并发数要小于理论并发数。
